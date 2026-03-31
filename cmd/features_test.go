@@ -130,6 +130,88 @@ func TestPickExerciseByNamePrefersPrefixAndBetterMatches(t *testing.T) {
 	}
 }
 
+func TestCalculateWorkoutStreak(t *testing.T) {
+	workouts := []api.Workout{
+		{StartTime: "2026-03-30T10:00:00Z"},
+		{StartTime: "2026-03-24T10:00:00Z"},
+		{StartTime: "2026-03-17T10:00:00Z"},
+		{StartTime: "2026-03-10T10:00:00Z"},
+		{StartTime: "2026-02-20T10:00:00Z"},
+	}
+
+	streak, since := calculateWorkoutStreak(workouts)
+	if streak != 4 {
+		t.Fatalf("expected 4-week streak, got %d", streak)
+	}
+	if since.Format("2006-01-02") != "2026-03-09" {
+		t.Fatalf("expected streak start 2026-03-09, got %s", since.Format("2006-01-02"))
+	}
+}
+
+func TestFindPersonalRecord(t *testing.T) {
+	w100 := 100.0
+	w105 := 105.0
+	r5 := 5
+	r3 := 3
+	record, ok := findPersonalRecord("Bench Press", []api.ExerciseHistoryEntry{
+		{WorkoutStartTime: "2026-03-10T10:00:00Z", WeightKG: &w100, Reps: &r5},
+		{WorkoutStartTime: "2026-03-17T10:00:00Z", WeightKG: &w105, Reps: &r3},
+	})
+	if !ok {
+		t.Fatal("expected PR to be found")
+	}
+	if record.WeightKG != 105 || record.Reps != 3 || record.Exercise != "Bench Press" {
+		t.Fatalf("unexpected record: %#v", record)
+	}
+}
+
+func TestBuildVolumePointsAndChart(t *testing.T) {
+	app.weightUnit = "kg"
+	w1 := 100.0
+	w2 := 110.0
+	r5 := 5
+	r3 := 3
+	entries := []api.ExerciseHistoryEntry{
+		{WorkoutID: "w1", WorkoutStartTime: "2026-03-10T10:00:00Z", WeightKG: &w1, Reps: &r5},
+		{WorkoutID: "w1", WorkoutStartTime: "2026-03-10T10:00:00Z", WeightKG: &w1, Reps: &r3},
+		{WorkoutID: "w2", WorkoutStartTime: "2026-03-17T10:00:00Z", WeightKG: &w2, Reps: &r5},
+	}
+	points := buildVolumePoints(entries)
+	if len(points) != 2 {
+		t.Fatalf("expected 2 volume points, got %d", len(points))
+	}
+	if points[0].VolumeKG != 800 || points[1].VolumeKG != 550 {
+		t.Fatalf("unexpected point volumes: %#v", points)
+	}
+	chart := renderVolumeChart("Bench Press", points, 8)
+	if !strings.Contains(chart[0], "Bench Press volume") {
+		t.Fatalf("unexpected chart title: %#v", chart)
+	}
+	if !strings.Contains(chart[1], "800.00") {
+		t.Fatalf("expected first chart row to include volume, got %#v", chart)
+	}
+	if !strings.Contains(chart[2], "550.00") {
+		t.Fatalf("expected second chart row to include volume, got %#v", chart)
+	}
+	if !strings.Contains(chart[1], "█") || !strings.Contains(chart[2], "█") {
+		t.Fatalf("expected chart bars, got %#v", chart)
+	}
+}
+
+func TestRenderCalendar(t *testing.T) {
+	lines := renderCalendar(2026, time.March, map[int]bool{9: true, 12: true, 16: true, 18: true, 19: true, 25: true, 27: true, 30: true})
+	joined := strings.Join(lines, "\n")
+	if !strings.Contains(joined, "March 2026") {
+		t.Fatalf("expected month heading, got %q", joined)
+	}
+	if !strings.Contains(joined, "[9]") || !strings.Contains(joined, "[12]") || !strings.Contains(joined, "[30]") {
+		t.Fatalf("expected workout days to be highlighted, got %q", joined)
+	}
+	if !strings.Contains(joined, "Mo Tu We Th Fr Sa Su") {
+		t.Fatalf("expected weekday heading, got %q", joined)
+	}
+}
+
 func mustTime(t *testing.T, value string) time.Time {
 	t.Helper()
 	parsed, err := time.Parse(time.RFC3339, value)

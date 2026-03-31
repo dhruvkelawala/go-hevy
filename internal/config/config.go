@@ -12,7 +12,9 @@ import (
 const EnvAPIKey = "GO_HEVY_API_KEY"
 
 type Config struct {
-	APIKey string `json:"api_key"`
+	APIKey       string `json:"api_key"`
+	Unit         string `json:"unit,omitempty"`
+	DefaultLimit int    `json:"default_limit,omitempty"`
 }
 
 func ConfigDir() (string, error) {

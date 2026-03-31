@@ -81,9 +81,15 @@ func printObject(v any, tableRows [][2]string, compactLines []string) error {
 
 func configRows() [][2]string {
 	path, _ := appconfig.ConfigPath()
+	defaultLimit := ""
+	if app.config.DefaultLimit > 0 {
+		defaultLimit = strconv.Itoa(app.config.DefaultLimit)
+	}
 	return [][2]string{
 		{"config_path", output.ValueOrDash(path)},
 		{"api_key", output.ValueOrDash(appconfig.Redact(app.config.EffectiveAPIKey()))},
+		{"unit", output.ValueOrDash(app.config.Unit)},
+		{"default_limit", output.ValueOrDash(defaultLimit)},
 		{"api_key_source", configSource()},
 	}
 }
@@ -216,6 +222,26 @@ func fetchWorkouts(client *api.Client, startPage, limit int, fetchAll bool) ([]a
 		workouts = workouts[:limit]
 	}
 	return workouts, nil
+}
+
+func fetchWorkoutDetails(client *api.Client, workouts []api.Workout) ([]api.Workout, error) {
+	detailed := make([]api.Workout, 0, len(workouts))
+	for _, workout := range workouts {
+		fullWorkout, err := client.GetWorkout(context.Background(), workout.ID)
+		if err != nil {
+			return nil, err
+		}
+		detailed = append(detailed, *fullWorkout)
+	}
+	return detailed, nil
+}
+
+func exerciseCatalogMap(exercises []api.ExerciseTemplate) map[string]api.ExerciseTemplate {
+	catalog := make(map[string]api.ExerciseTemplate, len(exercises))
+	for _, exercise := range exercises {
+		catalog[exercise.ID] = exercise
+	}
+	return catalog
 }
 
 func pickExerciseByName(exercises []api.ExerciseTemplate, name string) *api.ExerciseTemplate {

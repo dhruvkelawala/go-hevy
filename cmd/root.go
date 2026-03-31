@@ -66,6 +66,16 @@ func init() {
 			return err
 		}
 		app.config = cfg
+		if flag := cmd.Flags().Lookup("unit"); flag != nil && !flag.Changed {
+			if cfg != nil && (cfg.Unit == "kg" || cfg.Unit == "lbs") {
+				app.weightUnit = cfg.Unit
+			}
+		}
+		if flag := cmd.Flags().Lookup("page-size"); flag != nil && !flag.Changed {
+			if cfg != nil && cfg.DefaultLimit > 0 {
+				app.pageSize = cfg.DefaultLimit
+			}
+		}
 
 		jsonFlag, err := cmd.Flags().GetBool("json")
 		if err != nil {
