@@ -133,13 +133,28 @@ var weekCmd = &cobra.Command{
 }
 
 var diffCmd = &cobra.Command{
-	Use:   "diff <workout-id> <workout-id>",
-	Short: "Compare two workouts side by side",
-	Args:  cobra.ExactArgs(2),
+	Use:   "diff [workout-id] [workout-id]",
+	Short: "Compare two workouts side by side (defaults to last two)",
+	Args:  cobra.MaximumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := clientFromConfig()
 		if err != nil {
 			return err
+		}
+		// If no IDs provided, use the two most recent workouts
+		if len(args) < 2 {
+			workouts, err := fetchWorkouts(client, 1, 0, false)
+			if err != nil {
+				return err
+			}
+			if len(workouts) < 2 {
+				return fmt.Errorf("need at least 2 workouts to compare; found %d", len(workouts))
+			}
+			if len(args) == 0 {
+				args = []string{workouts[0].ID, workouts[1].ID}
+			} else {
+				args = append(args, workouts[1].ID)
+			}
 		}
 		left, err := client.GetWorkout(contextForCommand(cmd), args[0])
 		if err != nil {
@@ -249,13 +264,19 @@ var musclesCmd = &cobra.Command{
 		if app.outputMode == outputJSON {
 			return output.PrintJSON(os.Stdout, summary.MuscleDays)
 		}
-		for _, muscle := range []string{"chest", "back", "legs", "shoulders", "arms"} {
+		// Collect all muscle groups from data, sorted alphabetically
+		allMuscles := make([]string, 0, len(summary.MuscleDays))
+		for muscle := range summary.MuscleDays {
+			allMuscles = append(allMuscles, muscle)
+		}
+		sort.Strings(allMuscles)
+		if len(allMuscles) == 0 {
+			printLine("No muscles hit this week")
+		}
+		for _, muscle := range allMuscles {
 			days := summary.MuscleDays[muscle]
-			if len(days) == 0 {
-				printLine("%-10s (not hit)", muscle)
-				continue
-			}
-			printLine("%-10s %s (%s)", muscle, strings.Repeat("█", summary.MuscleGroups[muscle]*2), strings.Join(days, ", "))
+			label := strings.ReplaceAll(muscle, "_", " ")
+			printLine("%-14s %s (%s)", label, strings.Repeat("█", summary.MuscleGroups[muscle]*2), strings.Join(days, ", "))
 		}
 		return nil
 	},
