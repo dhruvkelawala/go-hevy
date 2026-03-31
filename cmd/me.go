@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/dhruvkelawala/go-hevy/internal/output"
+	"github.com/dhruvkelawala/hevy-cli/internal/output"
 	"github.com/spf13/cobra"
 )
 

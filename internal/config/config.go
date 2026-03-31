@@ -21,7 +21,7 @@ func ConfigDir() (string, error) {
 		return "", fmt.Errorf("resolve config dir: %w", err)
 	}
 
-	return filepath.Join(base, "go-hevy"), nil
+	return filepath.Join(base, "hevy-cli"), nil
 }
 
 func ConfigPath() (string, error) {

@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/dhruvkelawala/go-hevy/internal/api"
-	"github.com/dhruvkelawala/go-hevy/internal/output"
+	"github.com/dhruvkelawala/hevy-cli/internal/api"
+	"github.com/dhruvkelawala/hevy-cli/internal/output"
 	"github.com/spf13/cobra"
 )
 
@@ -25,11 +25,20 @@ var exercisesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		resp, err := client.ListExercises(contextForCommand(cmd), app.page, app.pageSize)
-		if err != nil {
-			return err
+		resp := &api.PaginatedExerciseTemplates{Page: app.page, PageCount: 1}
+		if needsExerciseCatalog(exerciseSearch, exerciseMuscle, exerciseCustomOnly) {
+			allExercises, err := fetchAllExercises(client)
+			if err != nil {
+				return err
+			}
+			resp.ExerciseTemplates = filterExercises(allExercises, exerciseSearch, exerciseMuscle, exerciseCustomOnly)
+		} else {
+			pagedResp, err := client.ListExercises(contextForCommand(cmd), app.page, app.pageSize)
+			if err != nil {
+				return err
+			}
+			resp = pagedResp
 		}
-		resp.ExerciseTemplates = filterExercises(resp.ExerciseTemplates, exerciseSearch, exerciseMuscle, exerciseCustomOnly)
 		switch app.outputMode {
 		case outputJSON:
 			return output.PrintJSON(os.Stdout, resp)

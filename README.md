@@ -1,16 +1,16 @@
-# go-hevy
+# hevy-cli
 
 [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go)](https://go.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-`go-hevy` is a Go CLI for the [Hevy](https://www.hevyapp.com) API. It gives you scriptable terminal access to workouts, routines, exercise templates, history, and profile data.
+`hevy-cli` is a Go CLI for the [Hevy](https://www.hevyapp.com) API. It gives you scriptable terminal access to workouts, routines, exercise templates, history, and profile data.
 
 ## Installation
 
 ### Go install
 
 ```bash
-go install github.com/dhruvkelawala/go-hevy@latest
+go install github.com/dhruvkelawala/hevy-cli@latest
 ```
 
 ### Homebrew / binaries
@@ -39,7 +39,7 @@ Hevy uses an `api-key` header.
 
 You can configure it in either place:
 
-- `~/.config/go-hevy/config.json`
+- `~/.config/hevy-cli/config.json`
 - `GO_HEVY_API_KEY` environment variable
 
 Environment variables take precedence over the config file.

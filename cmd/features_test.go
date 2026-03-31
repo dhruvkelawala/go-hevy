@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dhruvkelawala/go-hevy/internal/api"
+	"github.com/dhruvkelawala/hevy-cli/internal/api"
 )
 
 func TestFilterExercises(t *testing.T) {
@@ -28,6 +28,21 @@ func TestFilterExercises(t *testing.T) {
 	filtered = filterExercises(exercises, "", "", true)
 	if len(filtered) != 1 || filtered[0].ID != "2" {
 		t.Fatalf("expected only custom exercise, got %#v", filtered)
+	}
+}
+
+func TestNeedsExerciseCatalog(t *testing.T) {
+	if needsExerciseCatalog("", "", false) {
+		t.Fatal("expected paginated listing without filters")
+	}
+	if !needsExerciseCatalog("bench", "", false) {
+		t.Fatal("expected search to require full exercise catalog")
+	}
+	if !needsExerciseCatalog("", "chest", false) {
+		t.Fatal("expected muscle filter to require full exercise catalog")
+	}
+	if !needsExerciseCatalog("", "", true) {
+		t.Fatal("expected custom filter to require full exercise catalog")
 	}
 }
 
@@ -95,6 +110,23 @@ func TestBuildProgressPointsAndChart(t *testing.T) {
 	}
 	if !strings.Contains(chart[1], "█") || !strings.Contains(chart[2], "█") {
 		t.Fatalf("expected bars in chart, got %#v", chart)
+	}
+}
+
+func TestPickExerciseByNamePrefersPrefixAndBetterMatches(t *testing.T) {
+	exercises := []api.ExerciseTemplate{
+		{ID: "1", Title: "Assisted Pistol Squats"},
+		{ID: "2", Title: "Squat (Band)"},
+		{ID: "3", Title: "Squat (Barbell)"},
+		{ID: "4", Title: "Hack Squat"},
+	}
+
+	match := pickExerciseByName(exercises, "Squat")
+	if match == nil {
+		t.Fatal("expected a match for Squat")
+	}
+	if match.ID != "3" {
+		t.Fatalf("expected Squat (Barbell), got %#v", match)
 	}
 }
 

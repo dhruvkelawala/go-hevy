@@ -3,7 +3,7 @@ package cmd
 import (
 	"testing"
 
-	appconfig "github.com/dhruvkelawala/go-hevy/internal/config"
+	appconfig "github.com/dhruvkelawala/hevy-cli/internal/config"
 )
 
 func TestConfigRedact(t *testing.T) {

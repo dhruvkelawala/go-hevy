@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	appconfig "github.com/dhruvkelawala/go-hevy/internal/config"
-	"github.com/dhruvkelawala/go-hevy/internal/output"
+	appconfig "github.com/dhruvkelawala/hevy-cli/internal/config"
+	"github.com/dhruvkelawala/hevy-cli/internal/output"
 	"github.com/spf13/cobra"
 )
 

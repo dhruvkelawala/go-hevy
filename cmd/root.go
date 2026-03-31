@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dhruvkelawala/go-hevy/internal/api"
-	appconfig "github.com/dhruvkelawala/go-hevy/internal/config"
+	"github.com/dhruvkelawala/hevy-cli/internal/api"
+	appconfig "github.com/dhruvkelawala/hevy-cli/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -35,7 +35,7 @@ var app appContext
 var rootCmd = &cobra.Command{
 	Use:   "hevy",
 	Short: "CLI for the Hevy workout API",
-	Long:  "go-hevy is a fast, scriptable CLI for workouts, routines, exercises, and user data from Hevy.",
+	Long:  "hevy-cli is a fast, scriptable CLI for workouts, routines, exercises, and user data from Hevy.",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		cfg, err := appconfig.Load()
 		if err != nil {

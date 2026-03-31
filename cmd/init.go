@@ -6,14 +6,14 @@ import (
 	"os"
 	"strings"
 
-	appconfig "github.com/dhruvkelawala/go-hevy/internal/config"
+	appconfig "github.com/dhruvkelawala/hevy-cli/internal/config"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Interactively configure go-hevy",
+	Short: "Interactively configure hevy",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Fprint(os.Stdout, "Enter your Hevy API key: ")

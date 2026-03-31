@@ -1,4 +1,4 @@
-module github.com/dhruvkelawala/go-hevy
+module github.com/dhruvkelawala/hevy-cli
 
 go 1.22
 

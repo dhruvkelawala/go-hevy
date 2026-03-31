@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dhruvkelawala/go-hevy/internal/api"
-	appconfig "github.com/dhruvkelawala/go-hevy/internal/config"
-	"github.com/dhruvkelawala/go-hevy/internal/output"
+	"github.com/dhruvkelawala/hevy-cli/internal/api"
+	appconfig "github.com/dhruvkelawala/hevy-cli/internal/config"
+	"github.com/dhruvkelawala/hevy-cli/internal/output"
 	"github.com/fatih/color"
 )
 
@@ -167,6 +167,10 @@ func filterExercises(exercises []api.ExerciseTemplate, query, muscle string, cus
 	return filtered
 }
 
+func needsExerciseCatalog(query, muscle string, customOnly bool) bool {
+	return strings.TrimSpace(query) != "" || strings.TrimSpace(muscle) != "" || customOnly
+}
+
 func fetchAllExercises(client *api.Client) ([]api.ExerciseTemplate, error) {
 	page := 1
 	all := []api.ExerciseTemplate{}
@@ -216,19 +220,55 @@ func fetchWorkouts(client *api.Client, startPage, limit int, fetchAll bool) ([]a
 
 func pickExerciseByName(exercises []api.ExerciseTemplate, name string) *api.ExerciseTemplate {
 	needle := strings.ToLower(strings.TrimSpace(name))
-	for _, exercise := range exercises {
-		if strings.ToLower(exercise.Title) == needle {
-			copy := exercise
-			return &copy
+	if needle == "" {
+		return nil
+	}
+	bestScore := 0
+	var best *api.ExerciseTemplate
+	for i := range exercises {
+		score := exerciseMatchScore(exercises[i].Title, needle)
+		if score > bestScore {
+			bestScore = score
+			copy := exercises[i]
+			best = &copy
 		}
 	}
-	for _, exercise := range exercises {
-		if strings.Contains(strings.ToLower(exercise.Title), needle) {
-			copy := exercise
-			return &copy
+	return best
+}
+
+func exerciseMatchScore(title, needle string) int {
+	title = strings.ToLower(strings.TrimSpace(title))
+	if title == needle {
+		return 1000
+	}
+
+	score := 0
+	if strings.HasPrefix(title, needle) {
+		score = 800
+	}
+	if strings.Contains(title, needle) && score < 600 {
+		score = 600
+	}
+	for _, word := range strings.Fields(title) {
+		if strings.HasPrefix(word, needle) && score < 400 {
+			score = 400
 		}
 	}
-	return nil
+	if score == 0 {
+		return 0
+	}
+
+	if strings.Contains(title, "(barbell)") {
+		score += 50
+	}
+	if strings.Contains(title, "(dumbbell)") {
+		score += 25
+	}
+	if strings.Contains(title, "assisted") || strings.Contains(title, "band") {
+		score -= 25
+	}
+
+	return score
 }
 
 type progressPoint struct {

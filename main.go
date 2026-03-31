@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dhruvkelawala/go-hevy/cmd"
+	"github.com/dhruvkelawala/hevy-cli/cmd"
 	"github.com/fatih/color"
 )
 

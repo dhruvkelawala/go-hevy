@@ -20,7 +20,7 @@ brews:
   - repository:
       owner: dhruvkelawala
       name: homebrew-tap
-    homepage: https://github.com/dhruvkelawala/go-hevy
+    homepage: https://github.com/dhruvkelawala/hevy-cli
     description: CLI for the Hevy workout API
     license: MIT
 
