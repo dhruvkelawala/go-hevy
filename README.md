@@ -3,116 +3,150 @@
 [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go)](https://go.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-CLI tool for the [Hevy](https://www.hevyapp.com) workout tracking API, written in Go.
+`go-hevy` is a Go CLI for the [Hevy](https://www.hevyapp.com) API. It gives you scriptable terminal access to workouts, routines, exercise templates, history, and profile data.
 
 ## Installation
+
+### Go install
 
 ```bash
 go install github.com/dhruvkelawala/go-hevy@latest
 ```
 
-Or download a binary from [Releases](https://github.com/dhruvkelawala/go-hevy/releases).
+### Homebrew / binaries
 
-## Quick Start
+Homebrew and release binaries are published from GitHub Releases.
+
+## Quick start
 
 ```bash
-# Set up your API key (get it from Hevy app settings)
+# Interactive setup
 hevy init
 
-# List recent workouts
+# Recent workouts
 hevy workouts
 
-# Get workout details
+# Workout details
 hevy workout <id>
 
-# Check your profile
+# User profile
 hevy me
 ```
 
+## Authentication
+
+Hevy uses an `api-key` header.
+
+You can configure it in either place:
+
+- `~/.config/go-hevy/config.json`
+- `GO_HEVY_API_KEY` environment variable
+
+Environment variables take precedence over the config file.
+
 ## Commands
 
+### Core
+
 | Command | Description |
-|---------|-------------|
-| `hevy init` | Interactive setup — prompts for API key |
-| `hevy me` | Show user profile |
+| --- | --- |
 | `hevy workouts` | List recent workouts |
-| `hevy workout <id>` | Get workout details with exercises and sets |
-| `hevy count` | Total workout count |
+| `hevy workouts --json` | List workouts as JSON |
+| `hevy workout <id>` | Show workout details |
+| `hevy workout create -f workout.json` | Create a workout from JSON |
+| `hevy workout update <id> -f workout.json` | Update a workout from JSON |
+| `hevy count` | Show total workout count |
 | `hevy routines` | List routines |
-| `hevy routine <id>` | Get routine details |
+| `hevy routine <id>` | Show routine details |
 | `hevy exercises` | List exercise templates |
-| `hevy exercise <id>` | Get exercise template details |
-| `hevy history <exercise-id>` | Exercise history with progression data |
+| `hevy exercise <id>` | Show exercise template details |
+| `hevy history <exercise-id>` | Show exercise history |
+| `hevy me` | Show user info |
+
+### Utility
+
+| Command | Description |
+| --- | --- |
+| `hevy init` | Interactive API key setup |
 | `hevy config` | Show current config |
+| `hevy config set key <value>` | Store API key in config |
 | `hevy version` | Print version |
 
-## Output Formats
+## Output formats
+
+All list/detail commands support:
+
+- table output (default)
+- JSON via `--json` / `-j`
+- compact via `--compact`
+
+Examples:
 
 ```bash
-# Default: human-readable table
 hevy workouts
-
-# JSON output for scripting
 hevy workouts --json
-
-# Compact one-line-per-item
-hevy workouts --compact
+hevy workout <id> --compact
 ```
 
-## Configuration
+## Pagination
 
-Config is stored at `~/.config/go-hevy/config.json`.
-
-You can also set the API key via environment variable:
+List commands support:
 
 ```bash
-export GO_HEVY_API_KEY=your-api-key-here
+hevy workouts --page 2 --page-size 5
+hevy exercises --page-size 25
 ```
 
-## API
+Page size limits:
 
-go-hevy uses the [Hevy Public API](https://api.hevyapp.com/docs/). Get your API key from the Hevy app settings.
+- workouts: max 10
+- routines: max 10
+- exercises: max 100
 
-## Project Structure
+## Workout create/update JSON shape
 
+```json
+{
+  "workout": {
+    "title": "Friday Leg Day 🔥",
+    "description": "Medium intensity leg day focusing on quads.",
+    "start_time": "2024-08-14T12:00:00Z",
+    "end_time": "2024-08-14T12:45:00Z",
+    "is_private": false,
+    "exercises": [
+      {
+        "exercise_template_id": "D04AC939",
+        "notes": "Felt strong today.",
+        "sets": [
+          {
+            "type": "normal",
+            "weight_kg": 100,
+            "reps": 10,
+            "rpe": 8.5
+          }
+        ]
+      }
+    ]
+  }
+}
 ```
-go-hevy/
-├── main.go
-├── cmd/                    # CLI commands (cobra)
-│   ├── root.go
-│   ├── init.go
-│   ├── workouts.go
-│   ├── routines.go
-│   ├── exercises.go
-│   ├── history.go
-│   ├── me.go
-│   └── version.go
-├── internal/
-│   ├── api/                # HTTP client + API types
-│   │   ├── client.go
-│   │   ├── workouts.go
-│   │   ├── routines.go
-│   │   ├── exercises.go
-│   │   └── types.go
-│   ├── config/             # Config file management
-│   │   └── config.go
-│   └── output/             # Table + JSON formatters
-│       ├── table.go
-│       └── json.go
-└── .github/workflows/      # CI + goreleaser
-    └── release.yml
-```
 
-## Contributing
-
-PRs welcome. Please open an issue first for major changes.
+## AI agent integration example
 
 ```bash
-git clone https://github.com/dhruvkelawala/go-hevy.git
-cd go-hevy
-go build .
+hevy workouts --json | jq '.workouts[] | {id, title, start_time}'
+```
+
+## Development
+
+```bash
+go build ./...
 go test ./...
 ```
+
+## Release
+
+GitHub Actions builds tagged releases for macOS, Linux, and Windows using GoReleaser.
 
 ## License
 

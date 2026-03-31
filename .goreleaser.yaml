@@ -1,0 +1,28 @@
+project_name: hevy
+
+builds:
+  - main: ./main.go
+    binary: hevy
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format_overrides:
+      - goos: windows
+        format: zip
+
+brews:
+  - repository:
+      owner: dhruvkelawala
+      name: homebrew-tap
+    homepage: https://github.com/dhruvkelawala/go-hevy
+    description: CLI for the Hevy workout API
+    license: MIT
+
+changelog:
+  sort: asc

@@ -1,0 +1,78 @@
+package cmd
+
+import (
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/dhruvkelawala/go-hevy/internal/api"
+	"github.com/dhruvkelawala/go-hevy/internal/output"
+	"github.com/spf13/cobra"
+)
+
+var exercisesCmd = &cobra.Command{
+	Use:   "exercises",
+	Short: "List exercise templates",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := requirePositivePagination(app.page, app.pageSize, 100); err != nil {
+			return err
+		}
+		client, err := clientFromConfig()
+		if err != nil {
+			return err
+		}
+		resp, err := client.ListExercises(contextForCommand(cmd), app.page, app.pageSize)
+		if err != nil {
+			return err
+		}
+		switch app.outputMode {
+		case outputJSON:
+			return output.PrintJSON(os.Stdout, resp)
+		case outputCompact:
+			lines := make([]string, 0, len(resp.ExerciseTemplates))
+			for _, exercise := range resp.ExerciseTemplates {
+				lines = append(lines, fmt.Sprintf("%s | %s | %s", exercise.ID, exercise.Title, exercise.PrimaryMuscleGroup))
+			}
+			return output.PrintCompact(os.Stdout, lines)
+		default:
+			rows := make([][]string, 0, len(resp.ExerciseTemplates))
+			for _, exercise := range resp.ExerciseTemplates {
+				rows = append(rows, []string{exercise.ID, exercise.Title, exercise.Type, exercise.PrimaryMuscleGroup})
+			}
+			output.PrintTable(os.Stdout, []string{"ID", "Title", "Type", "Primary Muscle"}, rows)
+			return nil
+		}
+	},
+}
+
+var exerciseCmd = &cobra.Command{
+	Use:   "exercise",
+	Short: "Get an exercise template",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := clientFromConfig()
+		if err != nil {
+			return err
+		}
+		exercise, err := client.GetExercise(contextForCommand(cmd), args[0])
+		if err != nil {
+			return err
+		}
+		return renderExercise(exercise)
+	},
+}
+
+func renderExercise(exercise *api.ExerciseTemplate) error {
+	if exercise == nil {
+		return fmt.Errorf("exercise not found")
+	}
+	if app.outputMode == outputJSON {
+		return output.PrintJSON(os.Stdout, exercise)
+	}
+	compact := []string{fmt.Sprintf("%s | %s | %s", exercise.ID, exercise.Title, exercise.PrimaryMuscleGroup)}
+	if app.outputMode == outputCompact {
+		return output.PrintCompact(os.Stdout, compact)
+	}
+	output.PrintKeyValueTable(os.Stdout, [][2]string{{"id", exercise.ID}, {"title", exercise.Title}, {"type", exercise.Type}, {"primary_muscle_group", output.ValueOrDash(exercise.PrimaryMuscleGroup)}, {"secondary_muscle_groups", output.ValueOrDash(strings.Join(exercise.SecondaryMuscleGroups, ", "))}, {"is_custom", fmt.Sprintf("%t", exercise.IsCustom)}})
+	return nil
+}
