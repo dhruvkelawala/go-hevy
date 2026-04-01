@@ -8,7 +8,7 @@
 [![Hevy](https://img.shields.io/badge/data-Hevy-ef4444)](https://www.hevyapp.com)
 [![WHOOP](https://img.shields.io/badge/recovery-WHOOP-22c55e)](#readiness--recovery)
 
-<img src="./assets/hevy-cli-banner.svg" alt="hevy-cli hero banner" width="100%" />
+<img src="./assets/hevy-cli-hero.png" alt="hevy-cli — crab lifting weights" width="100%" />
 
 **A fast, scriptable, AI-friendly terminal client for Hevy.**
 
