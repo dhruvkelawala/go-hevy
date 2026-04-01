@@ -10,15 +10,17 @@
 
 <img src="./assets/hevy-cli-hero.png" alt="hevy-cli — crab lifting weights" width="100%" />
 
-**A fast, scriptable, AI-friendly terminal client for [Hevy](https://www.hevyapp.com).**
+**Give your AI agent a gym buddy.**
 
-Track workouts · Analyze progress · Detect plateaus · Plan your next session · Integrate WHOOP recovery
+A terminal client for [Hevy](https://www.hevyapp.com) built for AI coding agents — deterministic `--json` output, single-binary install, and a [SKILL.md](./SKILL.md) that any agent can pick up instantly.
+
+Built in one evening by [OpenClaw](https://openclaw.ai) + [Codex](https://openai.com/index/codex/) + [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
 
 <p>
-  <a href="#-install"><strong>Install</strong></a> ·
+  <a href="#-for-agents"><strong>Agent Setup</strong></a> ·
   <a href="#-what-can-it-do"><strong>Features</strong></a> ·
-  <a href="#-ai-agents"><strong>AI Agents</strong></a> ·
-  <a href="#-whoop-readiness"><strong>WHOOP</strong></a>
+  <a href="#-whoop-readiness"><strong>WHOOP</strong></a> ·
+  <a href="#-how-it-was-built"><strong>How It Was Built</strong></a>
 </p>
 
 </div>
@@ -151,49 +153,38 @@ hevy config set whoop_path /path/to/whoop-tracker
 
 ---
 
-## 🤖 AI Agents
+## 🤖 For Agents
 
-`hevy-cli` is designed for agents. Every command supports `--json`, the output is deterministic, and the install is a single curl.
+hevy-cli exists because AI agents need structured fitness data, not screenshots of an app. Every command supports `--json`, output is deterministic, and installation is a single `curl`.
 
-<table>
-<tr>
-<td width="50%">
+### Why agents need this
 
-**OpenClaw / Claude Code / Codex**
+- **Morning briefings** — your agent pulls WHOOP recovery + last workout + weekly stats and tells you whether to train today
+- **Plateau detection** — agent spots stalled lifts before you do, suggests deload or variation
+- **Accountability** — agent checks `hevy streak` and nudges you if you're slipping
+- **Programming** — agent reads your split, volume trends, and recovery to suggest what to train next
 
-```bash
-# Daily briefing
-hevy week --json
-hevy readiness --json
-
-# Analysis
-hevy pr --all --json
-hevy consistency --json
-hevy plateau --json
-```
-
-</td>
-<td width="50%">
-
-**Agent workflow**
+### Agent quickstart
 
 ```bash
-# 1. install (from SKILL.md)
-curl -sL ... | tar xz
+# 1. Drop SKILL.md into your agent's workspace
+cp SKILL.md ~/.openclaw/workspace/skills/hevy-cli/
 
-# 2. auth
-export GO_HEVY_API_KEY="..."
+# 2. Set the API key
+export GO_HEVY_API_KEY="your-hevy-api-key"
 
-# 3. use
-hevy last --json
-hevy plan --json
+# 3. Agent can now use any command
+hevy readiness --json    # Should I train today?
+hevy plan --json         # What should I train?
+hevy plateau --json      # Am I stalling anywhere?
+hevy week --json         # Weekly summary
 ```
 
-</td>
-</tr>
-</table>
+### Works with
 
-The [SKILL.md](./SKILL.md) file tells agents how to install, authenticate, and use every command — drop it into any agent workspace.
+- **[OpenClaw](https://openclaw.ai)** — drop SKILL.md into skills directory, agent auto-discovers it
+- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** / **[Codex](https://openai.com/index/codex/)** — pass `--json` flag, pipe output into agent context
+- **Any agent framework** — it's just a binary with structured output, no SDK needed
 
 ---
 
@@ -281,20 +272,27 @@ hevy last --kg             # kilograms
 
 ---
 
-## 🧬 Built with AI Agents
+## 🧬 How It Was Built
 
-This entire CLI was built in a single evening by AI coding agents, orchestrated through [OpenClaw](https://github.com/openclaw/openclaw).
+This entire CLI — 30+ commands across 3 phases — was built in a single evening by a team of AI agents.
 
-| Layer | Tool | Role |
-|---|---|---|
-| **Orchestrator** | [OpenClaw](https://openclaw.ai) | Task dispatch, QA pipeline, agent coordination |
-| **Senior Coder** | [Codex](https://openai.com/index/codex/) (GPT-5) | Wrote all Go code across 3 phases — core CLI, analytics, WHOOP integration |
-| **Code Review** | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (Sonnet) | Automated review after each phase, caught trend calculation bugs |
-| **Spec & QA** | SumoDeus (Opus) | Feature specs, manual testing, bug reports back to Codex |
+```
+SumoDeus (Opus)          wrote specs, tested, filed bugs
+        ↓
+OpenClaw task-dispatch   routed work to the right agent
+        ↓
+Codex / GPT-5 (Zeus)     wrote all Go code in isolated sessions
+        ↓
+Claude Code (Nemesis)    automated code review after each phase
+        ↓
+SumoDeus                 verified manually, dispatched next phase
+```
 
-The workflow: SumoDeus wrote feature specs → dispatched tasks via OpenClaw's task-dispatch plugin → Codex (Zeus) implemented in isolated ACP sessions → Claude Code (Nemesis) ran automated QA → SumoDeus verified manually.
+- **[OpenClaw](https://openclaw.ai)** orchestrated the entire pipeline — task dispatch, agent routing, QA automation
+- **[Codex](https://openai.com/index/codex/)** (GPT-5) wrote every line of Go across all three phases
+- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** (Sonnet) caught trend calculation bugs in automated review
 
-30+ commands, 3 phases, one evening. The [SKILL.md](./SKILL.md) file lets any AI agent pick up and use hevy-cli immediately.
+The [SKILL.md](./SKILL.md) that ships with hevy-cli is the same file the agents used to understand and test the tool. It's agent-native by design, not by afterthought.
 
 ---
 
