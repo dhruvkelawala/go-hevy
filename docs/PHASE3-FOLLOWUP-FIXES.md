@@ -54,7 +54,7 @@ go vet ./...
 hevy routine --help
 hevy exercise --help
 hevy history --help
-export GO_HEVY_API_KEY=0351ad57-d4bc-49a9-a68e-24e1afb58cfe
+export GO_HEVY_API_KEY=your-hevy-api-key
 hevy exercises --page-size 1 --json
 hevy history <id-from-hevy-exercises>
 ```
