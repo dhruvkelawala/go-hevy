@@ -16,13 +16,5 @@ archives:
       - goos: windows
         format: zip
 
-brews:
-  - repository:
-      owner: dhruvkelawala
-      name: homebrew-tap
-    homepage: https://github.com/dhruvkelawala/hevy-cli
-    description: CLI for the Hevy workout API
-    license: MIT
-
 changelog:
   sort: asc
