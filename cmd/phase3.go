@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -428,9 +429,9 @@ var readinessCmd = &cobra.Command{
 		if readinessNoWhoop {
 			report.Status, report.Advice = readinessWithoutWhoop(report.AvoidMuscles, report.LastWorkoutDate, now)
 		} else {
-			todayResp, whoopErr := fetchWhoopRecovery("--today", "--json")
+			todayResp, whoopErr := fetchWhoopRecovery(context.Background(), 1)
 			if whoopErr != nil {
-				report.WhoopMessage = "WHOOP not configured. Run: hevy config set whoop_path <path-to-whoop-skill>"
+				report.WhoopMessage = whoopUnavailableMessage(whoopErr)
 				report.Status, report.Advice = readinessWithoutWhoop(report.AvoidMuscles, report.LastWorkoutDate, now)
 			} else {
 				report.Whoop = parseWhoopSnapshot(todayResp)
@@ -440,7 +441,7 @@ var readinessCmd = &cobra.Command{
 					report.WhoopMessage = "WHOOP recovery data not available for today."
 					report.Status, report.Advice = readinessWithoutWhoop(report.AvoidMuscles, report.LastWorkoutDate, now)
 				}
-				historyResp, err := fetchWhoopRecovery("--days", fmt.Sprintf("%d", readinessHistoryDays), "--json")
+				historyResp, err := fetchWhoopRecovery(context.Background(), readinessHistoryDays)
 				if err == nil {
 					report.RecoveryHistory = parseWhoopHistory(historyResp)
 				}

@@ -184,23 +184,22 @@ Fri  66%  ██████
 ```
 
 ```bash
-# Setup: point to your WHOOP tracker skill
-hevy config set whoop_path /path/to/whoop-tracker
+# Optional fallback if WHOOP is unavailable
+hevy readiness --no-whoop
 ```
 
 ### How the WHOOP integration works
 
-`hevy-cli` does **not** talk to the WHOOP API directly from Go.
+`hevy-cli` talks to the WHOOP API natively from Go.
 
-Instead, `hevy readiness` shells out to a local Python helper script:
+For normal usage, `hevy readiness`:
 
-- default path: `~/.openclaw/workspace/skills/whoop-tracker`
-- script it runs: `scripts/get_recovery.py`
-- commands used internally:
-  - `python3 .../get_recovery.py --today --json`
-  - `python3 .../get_recovery.py --days 7 --json`
+- loads credentials from `~/.whoop/credentials.json`
+- loads tokens from `~/.whoop/token.json`
+- refreshes WHOOP OAuth tokens in Go when needed
+- fetches recovery history from `https://api.prod.whoop.com/developer/v2/recovery`
 
-That script reads your WHOOP OAuth credentials/tokens from `~/.whoop/` and returns JSON. `hevy-cli` then parses the recovery score, HRV, and resting heart rate, combines that with your recent Hevy workouts, and produces a readiness recommendation.
+`hevy-cli` then parses the recovery score, HRV, and resting heart rate, combines that with your recent Hevy workouts, and produces a readiness recommendation.
 
 If WHOOP isn't configured, `hevy-cli` falls back to a simpler readiness heuristic based on your recent training history. You can also force that mode with:
 
@@ -209,26 +208,6 @@ hevy readiness --no-whoop
 ```
 
 ### Integrate your WHOOP account with hevy-cli
-
-#### Option 1 — use the default OpenClaw WHOOP skill path
-
-If you already use OpenClaw and have the `whoop-tracker` skill installed at:
-
-```bash
-~/.openclaw/workspace/skills/whoop-tracker
-```
-
-then `hevy readiness` should work automatically once your WHOOP auth is set up.
-
-#### Option 2 — point hevy-cli at a custom WHOOP helper path
-
-If your WHOOP helper lives somewhere else:
-
-```bash
-hevy config set whoop_path /absolute/path/to/whoop-tracker
-```
-
-`whoop_path` should point to the **skill directory**, not the Python file. `hevy-cli` will append `scripts/get_recovery.py` automatically.
 
 #### WHOOP setup steps
 
@@ -241,7 +220,9 @@ hevy config set whoop_path /absolute/path/to/whoop-tracker
 hevy readiness
 ```
 
-For the full auth flow, see the `whoop-tracker` skill docs in your OpenClaw workspace.
+You do **not** need the OpenClaw `whoop-tracker` Python helper for normal readiness usage.
+
+> `whoop_path` remains in config only for backward compatibility with older setups and is no longer used by the native readiness path.
 
 ---
 

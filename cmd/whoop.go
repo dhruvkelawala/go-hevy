@@ -1,13 +1,10 @@
 package cmd
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"strings"
-	"time"
+
+	"github.com/dhruvkelawala/hevy-cli/internal/whoop"
 )
 
 type whoopRecoverySnapshot struct {
@@ -21,74 +18,15 @@ type whoopHistoryPoint struct {
 	RecoveryScore float64 `json:"recovery_score"`
 }
 
-type whoopRecoveryResponse struct {
-	Records []struct {
-		CycleStart string `json:"cycle_start"`
-		ScoreState string `json:"score_state"`
-		Score      struct {
-			RecoveryScore    float64 `json:"recovery_score"`
-			RestingHeartRate float64 `json:"resting_heart_rate"`
-			HRVRMSSD         float64 `json:"hrv_rmssd_milli"`
-		} `json:"score"`
-	} `json:"records"`
-}
-
-func whoopScriptPath() (string, error) {
-	base := strings.TrimSpace(defaultWhoopPath())
-	if app.config != nil && strings.TrimSpace(app.config.WhoopPath) != "" {
-		base = strings.TrimSpace(app.config.WhoopPath)
-	}
-	expanded, err := expandHome(base)
-	if err != nil {
-		return "", err
-	}
-	if strings.HasSuffix(expanded, ".py") {
-		return expanded, nil
-	}
-	return filepath.Join(expanded, "scripts", "get_recovery.py"), nil
-}
-
-func expandHome(path string) (string, error) {
-	if path == "" || path[0] != '~' {
-		return path, nil
-	}
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-	if path == "~" {
-		return home, nil
-	}
-	return filepath.Join(home, strings.TrimPrefix(path, "~/")), nil
-}
-
-func fetchWhoopRecovery(args ...string) (*whoopRecoveryResponse, error) {
-	scriptPath, err := whoopScriptPath()
+func fetchWhoopRecovery(ctx context.Context, days int) (*whoop.RecoveryCollection, error) {
+	client, err := whoop.NewClient()
 	if err != nil {
 		return nil, err
 	}
-	if _, err := os.Stat(scriptPath); err != nil {
-		return nil, err
-	}
-	cmdArgs := append([]string{scriptPath}, args...)
-	cmd := exec.Command("python3", cmdArgs...)
-	cmd.Env = append(os.Environ(), "PYTHONWARNINGS=ignore")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		message := strings.TrimSpace(string(output))
-		if message == "" {
-			return nil, err
-		}
-		return nil, fmt.Errorf("%w: %s", err, message)
-	}
-	var resp whoopRecoveryResponse
-	if err := json.Unmarshal(output, &resp); err != nil {
-		return nil, fmt.Errorf("parse WHOOP response: %w", err)
-	}
-	return &resp, nil
+	return client.ListRecoveries(ctx, days)
 }
 
-func parseWhoopSnapshot(resp *whoopRecoveryResponse) *whoopRecoverySnapshot {
+func parseWhoopSnapshot(resp *whoop.RecoveryCollection) *whoopRecoverySnapshot {
 	if resp == nil || len(resp.Records) == 0 {
 		return nil
 	}
@@ -103,19 +41,26 @@ func parseWhoopSnapshot(resp *whoopRecoveryResponse) *whoopRecoverySnapshot {
 	}
 }
 
-func parseWhoopHistory(resp *whoopRecoveryResponse) []whoopHistoryPoint {
+func parseWhoopHistory(resp *whoop.RecoveryCollection) []whoopHistoryPoint {
 	if resp == nil {
 		return nil
 	}
 	history := make([]whoopHistoryPoint, 0, len(resp.Records))
 	for _, record := range resp.Records {
 		label := "-"
-		if startedAt, err := time.Parse(time.RFC3339, record.CycleStart); err == nil {
-			label = startedAt.Local().Format("Mon")
+		if !record.CreatedAt.IsZero() {
+			label = record.CreatedAt.Local().Format("Mon")
 		}
 		history = append(history, whoopHistoryPoint{Day: label, RecoveryScore: record.Score.RecoveryScore})
 	}
 	return history
+}
+
+func whoopUnavailableMessage(err error) string {
+	if err == nil {
+		return "WHOOP unavailable. Falling back to training-only readiness."
+	}
+	return fmt.Sprintf("WHOOP unavailable (%s). Falling back to training-only readiness.", err)
 }
 
 func whoopStatus(score float64) (string, string) {

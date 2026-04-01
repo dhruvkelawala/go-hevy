@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/dhruvkelawala/hevy-cli/internal/api"
+	"github.com/dhruvkelawala/hevy-cli/internal/whoop"
 )
 
 func TestBuildPlateauReportCountsCurrentPlateauWindow(t *testing.T) {
@@ -106,5 +107,37 @@ func TestReadinessWithoutWhoopRecentWorkout(t *testing.T) {
 	}
 	if advice == "" {
 		t.Fatal("expected advice")
+	}
+}
+
+func TestParseWhoopSnapshotReturnsLatestScoredRecord(t *testing.T) {
+	resp := &whoop.RecoveryCollection{Records: []whoop.RecoveryRecord{{
+		ScoreState: "SCORED",
+		Score: whoop.RecoveryScore{
+			RecoveryScore:    88,
+			RestingHeartRate: 53,
+			HRVRMSSD:         77.4,
+		},
+	}}}
+	snapshot := parseWhoopSnapshot(resp)
+	if snapshot == nil {
+		t.Fatal("expected snapshot")
+	}
+	if snapshot.RecoveryScore != 88 || snapshot.RestingHR != 53 || snapshot.HRVRMSSD != 77.4 {
+		t.Fatalf("unexpected snapshot: %#v", snapshot)
+	}
+}
+
+func TestParseWhoopHistoryUsesCreatedAtWeekday(t *testing.T) {
+	resp := &whoop.RecoveryCollection{Records: []whoop.RecoveryRecord{{
+		CreatedAt: time.Date(2026, time.April, 1, 7, 0, 0, 0, time.UTC),
+		Score:     whoop.RecoveryScore{RecoveryScore: 64},
+	}}}
+	history := parseWhoopHistory(resp)
+	if len(history) != 1 {
+		t.Fatalf("expected 1 history point, got %d", len(history))
+	}
+	if history[0].Day != "Wed" {
+		t.Fatalf("expected Wed label, got %q", history[0].Day)
 	}
 }

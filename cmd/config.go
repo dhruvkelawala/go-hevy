@@ -64,6 +64,12 @@ var configSetCmd = &cobra.Command{
 			cfg.DefaultLimit = limit
 		case "whoop_path":
 			cfg.WhoopPath = args[1]
+			if err := appconfig.Save(cfg); err != nil {
+				return err
+			}
+			app.config = cfg
+			printLine("Updated config key %q (deprecated for readiness; native WHOOP now uses ~/.whoop/)", args[0])
+			return nil
 		default:
 			return fmt.Errorf("unsupported config key %q", args[0])
 		}
