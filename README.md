@@ -8,9 +8,18 @@
 [![Hevy](https://img.shields.io/badge/data-Hevy-ef4444)](https://www.hevyapp.com)
 [![WHOOP](https://img.shields.io/badge/recovery-WHOOP-22c55e)](#readiness--recovery)
 
+<img src="./assets/hevy-cli-banner.svg" alt="hevy-cli hero banner" width="100%" />
+
 **A fast, scriptable, AI-friendly terminal client for Hevy.**
 
 Track workouts, inspect routines, export data, analyze progress, detect plateaus, and combine training history with WHOOP recovery — all from the command line.
+
+<p>
+  <a href="#quickstart"><strong>Quickstart</strong></a> ·
+  <a href="#command-map"><strong>Commands</strong></a> ·
+  <a href="#ai-agents"><strong>AI Agents</strong></a> ·
+  <a href="#readiness--recovery"><strong>WHOOP</strong></a>
+</p>
 
 </div>
 
@@ -70,6 +79,23 @@ Hevy has a great mobile app, but sometimes you want terminal-native access:
 - compact output mode
 - shell completions
 - works well in scripts, TUI workflows, and coding agents
+
+<table>
+  <tr>
+    <td valign="top" width="33%">
+      <strong>📊 Analyze</strong><br/>
+      Streaks, PRs, volume, split, plateau, fatigue, records, and consistency — straight from terminal.
+    </td>
+    <td valign="top" width="33%">
+      <strong>🧠 Plan</strong><br/>
+      Use <code>hevy plan</code> and <code>hevy readiness</code> to decide what to train next with context.
+    </td>
+    <td valign="top" width="33%">
+      <strong>🤖 Automate</strong><br/>
+      JSON output and shell-native ergonomics make it easy to plug into OpenClaw, Claude Code, and Codex.
+    </td>
+  </tr>
+</table>
 
 ---
 

@@ -1,0 +1,79 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07111F"/>
+      <stop offset="0.45" stop-color="#0B1628"/>
+      <stop offset="1" stop-color="#101C31"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#7DD3FC"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#86EFAC"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+    <linearGradient id="pink" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#F9A8D4"/>
+      <stop offset="1" stop-color="#EC4899"/>
+    </linearGradient>
+    <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="40"/>
+    </filter>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#020617" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#bg)"/>
+
+  <circle cx="1110" cy="88" r="140" fill="#22D3EE" fill-opacity="0.12" filter="url(#blur)"/>
+  <circle cx="170" cy="540" r="180" fill="#34D399" fill-opacity="0.12" filter="url(#blur)"/>
+  <circle cx="630" cy="-10" r="180" fill="#EC4899" fill-opacity="0.08" filter="url(#blur)"/>
+
+  <rect x="58" y="62" width="1164" height="516" rx="28" fill="#0A1324" stroke="#1E293B" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="58" y="62" width="1164" height="50" rx="28" fill="#0F172A"/>
+  <circle cx="92" cy="87" r="8" fill="#FB7185"/>
+  <circle cx="118" cy="87" r="8" fill="#FBBF24"/>
+  <circle cx="144" cy="87" r="8" fill="#4ADE80"/>
+
+  <text x="94" y="176" fill="#E2E8F0" font-size="70" font-weight="700" font-family="SF Pro Display, Inter, Arial, sans-serif">hevy-cli</text>
+  <text x="96" y="220" fill="#7DD3FC" font-size="22" font-weight="600" font-family="SF Pro Display, Inter, Arial, sans-serif">terminal-first Hevy analytics + WHOOP readiness</text>
+  <text x="96" y="276" fill="#94A3B8" font-size="22" font-family="SF Pro Text, Inter, Arial, sans-serif">Workouts. PRs. Volume. Split analysis. Plan. Recovery.</text>
+  <text x="96" y="310" fill="#94A3B8" font-size="22" font-family="SF Pro Text, Inter, Arial, sans-serif">Built for shell users, scripts, OpenClaw, Claude Code, and Codex.</text>
+
+  <rect x="96" y="354" width="240" height="58" rx="14" fill="#082F49" stroke="#0EA5E9"/>
+  <text x="122" y="390" fill="#E0F2FE" font-size="24" font-weight="700" font-family="SF Pro Display, Inter, Arial, sans-serif">hevy readiness</text>
+  <text x="98" y="462" fill="#E2E8F0" font-size="20" font-family="SFMono-Regular, Menlo, monospace">🟢 WHOOP Recovery: 89%</text>
+  <text x="98" y="494" fill="#CBD5E1" font-size="20" font-family="SFMono-Regular, Menlo, monospace">Status: GREEN — full send</text>
+  <text x="98" y="526" fill="#CBD5E1" font-size="20" font-family="SFMono-Regular, Menlo, monospace">Suggested: Pull</text>
+
+  <rect x="640" y="148" width="520" height="148" rx="20" fill="#0F1B2E" stroke="#243244"/>
+  <text x="674" y="188" fill="#7DD3FC" font-size="18" font-family="SFMono-Regular, Menlo, monospace">$ hevy week</text>
+  <text x="674" y="222" fill="#E2E8F0" font-size="18" font-family="SFMono-Regular, Menlo, monospace">sessions          2</text>
+  <text x="674" y="252" fill="#E2E8F0" font-size="18" font-family="SFMono-Regular, Menlo, monospace">total_volume      19599.00</text>
+  <text x="674" y="282" fill="#E2E8F0" font-size="18" font-family="SFMono-Regular, Menlo, monospace">avg_duration_min  73.4</text>
+
+  <rect x="640" y="320" width="248" height="212" rx="20" fill="#0F1B2E" stroke="#243244"/>
+  <text x="668" y="356" fill="#86EFAC" font-size="18" font-family="SFMono-Regular, Menlo, monospace">PRs</text>
+  <rect x="668" y="382" width="160" height="10" rx="5" fill="#173049"/>
+  <rect x="668" y="382" width="122" height="10" rx="5" fill="url(#cyan)"/>
+  <text x="668" y="416" fill="#E2E8F0" font-size="17" font-family="SFMono-Regular, Menlo, monospace">Squat       70×12</text>
+  <rect x="668" y="434" width="160" height="10" rx="5" fill="#173049"/>
+  <rect x="668" y="434" width="138" height="10" rx="5" fill="url(#green)"/>
+  <text x="668" y="468" fill="#E2E8F0" font-size="17" font-family="SFMono-Regular, Menlo, monospace">Bench       55×8</text>
+  <rect x="668" y="486" width="160" height="10" rx="5" fill="#173049"/>
+  <rect x="668" y="486" width="111" height="10" rx="5" fill="url(#pink)"/>
+
+  <rect x="912" y="320" width="248" height="212" rx="20" fill="#0F1B2E" stroke="#243244"/>
+  <text x="940" y="356" fill="#F8FAFC" font-size="18" font-family="SFMono-Regular, Menlo, monospace">Volume trend</text>
+  <polyline points="940,490 980,470 1020,438 1060,446 1100,398 1140,360" fill="none" stroke="url(#cyan)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="940" cy="490" r="5" fill="#67E8F9"/>
+  <circle cx="980" cy="470" r="5" fill="#67E8F9"/>
+  <circle cx="1020" cy="438" r="5" fill="#67E8F9"/>
+  <circle cx="1060" cy="446" r="5" fill="#67E8F9"/>
+  <circle cx="1100" cy="398" r="5" fill="#67E8F9"/>
+  <circle cx="1140" cy="360" r="5" fill="#67E8F9"/>
+
+  <text x="944" y="520" fill="#94A3B8" font-size="15" font-family="SFMono-Regular, Menlo, monospace">Squat 2080 → 3420kg</text>
+</svg>
